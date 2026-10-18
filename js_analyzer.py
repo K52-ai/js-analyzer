@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""
-JS Analyzer
-by K52-ai
-
-Extract endpoints, API keys, tokens, emails, and passwords
-from JavaScript files on a target website.
-"""
 
 import re
 import sys
@@ -16,10 +9,6 @@ from bs4 import BeautifulSoup
 from colorama import Fore, Style, init
 
 init(autoreset=True)
-
-# ---------------------------------------------------------------------------
-# Colors
-# ---------------------------------------------------------------------------
 
 C = {
     "banner":  Fore.CYAN + Style.BRIGHT,
@@ -35,15 +24,10 @@ C = {
 UA = "Mozilla/5.0 (compatible; JSAnalyzer/1.0)"
 TIMEOUT = 10
 
-# ---------------------------------------------------------------------------
-# Rainbow banner
-# ---------------------------------------------------------------------------
-
 RAINBOW = [Fore.RED, Fore.YELLOW, Fore.GREEN, Fore.CYAN, Fore.BLUE, Fore.MAGENTA]
 
 
 def rainbow(text):
-    """Apply rainbow colors char by char."""
     out = ""
     for i, ch in enumerate(text):
         out += RAINBOW[i % len(RAINBOW)] + ch
@@ -63,10 +47,6 @@ def banner():
     print(f"                          {C['dim']}{'─' * 32}")
     print()
 
-
-# ---------------------------------------------------------------------------
-# Regex patterns
-# ---------------------------------------------------------------------------
 
 PATTERNS = {
     "endpoints": re.compile(
@@ -95,10 +75,6 @@ PATTERNS = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Fetching
-# ---------------------------------------------------------------------------
-
 def fetch(url):
     try:
         r = requests.get(url, timeout=TIMEOUT, headers={"User-Agent": UA},
@@ -118,10 +94,6 @@ def find_js_files(html, base_url):
             js_urls.add(urljoin(base_url, src))
     return sorted(js_urls)
 
-
-# ---------------------------------------------------------------------------
-# Analysis
-# ---------------------------------------------------------------------------
 
 def analyze(js_content):
     findings = {}
@@ -154,16 +126,12 @@ def print_findings(js_url, findings):
         marker = " ⚠️" if is_secret else ""
 
         print(f"      {color}├─ {category}:{marker}{C['reset']}")
-        for v in values[:10]:  # cap at 10 per category
+        for v in values[:10]:
             print(f"      {C['dim']}│   {v}{C['reset']}")
         if len(values) > 10:
             print(f"      {C['dim']}│   ... +{len(values) - 10} more{C['reset']}")
     print()
 
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
 
 def main():
     banner()
@@ -211,7 +179,6 @@ def main():
                            "github_token", "slack_token", "jwt", "password"):
                     total_secrets += len(findings[cat])
 
-    # Save
     with open("results.txt", "w", encoding="utf-8") as f:
         for js_url, findings in all_findings.items():
             f.write(f"\n=== {js_url} ===\n")
@@ -220,7 +187,6 @@ def main():
                 for v in values:
                     f.write(f"  {v}\n")
 
-    # Summary
     print(f"  {C['dim']}{'─' * 60}{C['reset']}")
     print(f"  {C['ok']}[+] JS Files:  {len(js_files)}{C['reset']}")
     print(f"  {C['warn']}[+] Findings:  {len(all_findings)}{C['reset']}")
